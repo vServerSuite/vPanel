@@ -4,3 +4,8 @@
 @import '~vuetify/dist/vuetify.min.css';
 
 @import '~@mdi/font/css/materialdesignicons.min.css';
+
+.v-sheet--offset {
+    top: -24px;
+    position: relative;
+  }

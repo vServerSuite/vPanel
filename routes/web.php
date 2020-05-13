@@ -20,3 +20,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/onboarding', function () {
+    return view('auth/onboarding');
+});
+
+Route::get('/discord/callback', function() {
+    return view('auth/discord_callback');
+});

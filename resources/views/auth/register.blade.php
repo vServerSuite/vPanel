@@ -1,8 +1,8 @@
-@extends('layouts.blank')
+@extends('layouts.gateway')
 
 @section('content')
     <v-container
-        class="fill-height"
+        class="fill-height primary darken-4"
         fluid
     >
         <v-row

@@ -17,11 +17,8 @@ Vue.use(Vuetify);
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 
-const files = require.context('./', true, /\.vue$/i)
-files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-// Vue.component('nav-component', require('./components/navigation/NavComponent').default);
+const files = require.context('./', true, /\.vue$/i);
+files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -47,9 +44,3 @@ const app = new Vue({
         }
     })
 });
-
-export default {
-    data: () => ({
-        drawer: true,
-    }),
-};
