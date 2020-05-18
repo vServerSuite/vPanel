@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Session;
 */
 
 use App\Http\Controllers\DiscordController;
+use App\Http\Controllers\OnboardingController;
 
 $v1Prefix = "/v1/";
 
@@ -38,6 +39,10 @@ Route::get($v1Prefix . 'auth/discord', 'DiscordController@generateAuthUrl');
 Route::get($v1Prefix . 'auth/discord/callback', 'DiscordController@callback');
 Route::post($v1Prefix . 'auth/discord/flow', 'DiscordController@code_exchange');
 
+Route::post($v1Prefix . 'onboarding/generate', 'OnboardingController@generate');
+Route::post($v1Prefix . 'onboarding/save/mc', 'OnboardingController@save_mc');
+Route::post($v1Prefix . 'onboarding/save/discord', 'OnboardingController@save_discord');
+
 Route::post($v1Prefix . 'auth/minecraft', function (Request $request) {
     $token = App\Models\PanelVerificationToken::where('token', $request->input('code'))->first();
 
@@ -55,17 +60,4 @@ Route::post($v1Prefix . 'auth/minecraft', function (Request $request) {
     } else {
         return '{"isValid": "false", "error": "Incorrect Authentication Pin"}';
     }
-});
-
-Route::group(['middleware' => ['web']], function () {
-    Route::post('/v1/session', function (Request $request) {
-        $values = $request->all();
-        foreach ($values as $key => $value) {
-            $request->session()->put($key, $value);
-        }
-        var_dump($request->session()->all());
-    });
-    Route::get('/v1/session/{key?}', function (Request $request, $key = null) {
-        return $key == null ? json_encode($request->session()->all()) : json_encode($request->session()->get($key));
-    });
 });

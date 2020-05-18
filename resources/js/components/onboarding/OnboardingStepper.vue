@@ -168,7 +168,16 @@
                             ></OnboardingCard>
                         </v-col>
                         <v-col cols="6">
-                            Test
+                            <v-form
+                                ref="form"
+                            >
+                                <v-text-field
+                                    :rules="emailRules"
+                                    label="E-mail Address"
+                                    :v-text="discord.email"
+                                    required
+                                ></v-text-field>
+                            </v-form>
                         </v-col>
                     </v-row>
                 </div>
@@ -191,6 +200,11 @@ export default {
     components: {
         PincodeInput
     },
+    props: {
+        onboarding_id: null,
+        onboarding_mc_uuid: null,
+        onboarding_discord_id: null
+    },
     data() {
         return {
             stepperPosition: 1,
@@ -211,7 +225,11 @@ export default {
                 username: null,
                 id: null,
                 avatar: null
-            }
+            },
+            emailRules: [
+                v => !!v || "E-mail is required",
+                v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+            ]
         };
     },
     methods: {
@@ -227,12 +245,21 @@ export default {
                     if (response.data.isValid != "true") {
                         vm.mc.error = response.data.error;
                     } else {
-                        vm.mc.uuid = response.data.uuid;
-                        vm.mc.username = response.data.username;
-                        vm.mc.valid = response.data.isValid == "true";
-                        axios.post("/api/v1/session", {
-                            mc_uuid: response.data.uuid
-                        });
+                        axios
+                            .post("/api/v1/onboarding/save/mc", {
+                                key: vm.onboarding_id,
+                                mc_uuid: response.data.uuid
+                            })
+                            .then(function(saveResponse) {
+                                if (saveResponse.data.success == false) {
+                                    vm.mc.error = saveResponse.data.error;
+                                } else {
+                                    vm.mc.uuid = response.data.uuid;
+                                    vm.mc.username = response.data.username;
+                                    vm.mc.valid =
+                                        response.data.isValid == "true";
+                                }
+                            });
                     }
                     vm.mc.loading = false;
                 });
@@ -252,14 +279,23 @@ export default {
                 axios
                     .post("/api/v1/auth/discord/flow", { code: code })
                     .then(function(response) {
-                        vm.discord.valid = true;
-                        vm.discord.username = response.data.username;
-                        vm.discord.email = response.data.email;
-                        vm.discord.id = response.data.id;
-                        vm.discord.avatar = response.data.avatar;
-                        axios.post("/api/v1/session", {
-                            discord_id: response.data.id
-                        });
+                        axios
+                            .post("/api/v1/onboarding/save/discord", {
+                                key: vm.onboarding_id,
+                                discord_id: response.data.id
+                            })
+                            .then(function(saveResponse) {
+                                if (saveResponse.data.success == false) {
+                                    vm.discord.error = saveResponse.data.error;
+                                } else {
+                                    vm.discord.valid = true;
+                                    vm.discord.username =
+                                        response.data.username;
+                                    vm.discord.email = response.data.email;
+                                    vm.discord.id = response.data.id;
+                                    vm.discord.avatar = response.data.avatar;
+                                }
+                            });
                         vm.discord.loading = false;
                     })
                     .then(function(response) {

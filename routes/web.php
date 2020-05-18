@@ -21,10 +21,25 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/onboarding', function () {
-    return view('auth/onboarding');
+Route::get('/onboarding/{onboarding_id}', function ($onboardingid) {
+    $onboarding = App\Models\Onboarding::find($onboardingid);
+    if ($onboarding != null) {
+        return view('auth/onboarding', [
+            'error' => null,
+            'id' => $onboardingid,
+            'mc_uuid' => $onboarding->mc_uuid_actual,
+            'discord_id' => $onboarding->discord_id
+        ]);
+    } else {
+        return view('auth/onboarding', [
+            'error' => "Onboarding Id not found - Please generate an id via running /panel verify in-game",
+            'id' => $onboardingid,
+            'mc_uuid' => "null",
+            'discord_id' => "null"
+        ]);
+    }
 });
 
-Route::get('/discord/callback', function() {
+Route::get('/discord/callback', function () {
     return view('auth/discord_callback');
 });

@@ -2428,6 +2428,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2439,11 +2448,16 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
   components: {
     PincodeInput: vue_pincode_input__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
+  props: {
+    onboarding_id: null,
+    onboarding_mc_uuid: null,
+    onboarding_discord_id: null
+  },
   data: function data() {
     return {
       stepperPosition: 1,
       mcBoxNumber: 0,
-      ip: "panel.benh.codes",
+      ip: "voyager.vsuite.dev",
       mc: {
         loading: false,
         code: "",
@@ -2459,7 +2473,12 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
         username: null,
         id: null,
         avatar: null
-      }
+      },
+      emailRules: [function (v) {
+        return !!v || "E-mail is required";
+      }, function (v) {
+        return /.+@.+\..+/.test(v) || "E-mail must be valid";
+      }]
     };
   },
   methods: {
@@ -2475,11 +2494,17 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
         if (response.data.isValid != "true") {
           vm.mc.error = response.data.error;
         } else {
-          vm.mc.uuid = response.data.uuid;
-          vm.mc.username = response.data.username;
-          vm.mc.valid = response.data.isValid == "true";
-          axios.post("/api/v1/session", {
+          axios.post("/api/v1/onboarding/save/mc", {
+            key: vm.onboarding_id,
             mc_uuid: response.data.uuid
+          }).then(function (saveResponse) {
+            if (saveResponse.data.success == false) {
+              vm.mc.error = saveResponse.data.error;
+            } else {
+              vm.mc.uuid = response.data.uuid;
+              vm.mc.username = response.data.username;
+              vm.mc.valid = response.data.isValid == "true";
+            }
           });
         }
 
@@ -2497,13 +2522,19 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
         axios.post("/api/v1/auth/discord/flow", {
           code: code
         }).then(function (response) {
-          vm.discord.valid = true;
-          vm.discord.username = response.data.username;
-          vm.discord.email = response.data.email;
-          vm.discord.id = response.data.id;
-          vm.discord.avatar = response.data.avatar;
-          axios.post("/api/v1/session", {
+          axios.post("/api/v1/onboarding/save/discord", {
+            key: vm.onboarding_id,
             discord_id: response.data.id
+          }).then(function (saveResponse) {
+            if (saveResponse.data.success == false) {
+              vm.discord.error = saveResponse.data.error;
+            } else {
+              vm.discord.valid = true;
+              vm.discord.username = response.data.username;
+              vm.discord.email = response.data.email;
+              vm.discord.id = response.data.id;
+              vm.discord.avatar = response.data.avatar;
+            }
           });
           vm.discord.loading = false;
         }).then(function (response) {
@@ -7120,11 +7151,28 @@ var render = function() {
                         1
                       ),
                       _vm._v(" "),
-                      _c("v-col", { attrs: { cols: "6" } }, [
-                        _vm._v(
-                          "\n                        Test\n                    "
-                        )
-                      ])
+                      _c(
+                        "v-col",
+                        { attrs: { cols: "6" } },
+                        [
+                          _c(
+                            "v-form",
+                            { ref: "form" },
+                            [
+                              _c("v-text-field", {
+                                attrs: {
+                                  rules: _vm.emailRules,
+                                  label: "E-mail Address",
+                                  "v-text": _vm.discord.email,
+                                  required: ""
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
                     ],
                     1
                   )
