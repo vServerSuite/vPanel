@@ -2443,7 +2443,7 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
     return {
       stepperPosition: 1,
       mcBoxNumber: 0,
-      ip: "panel.benh.codes",
+      ip: "voyager.vsuite.dev",
       mc: {
         loading: false,
         code: "",
