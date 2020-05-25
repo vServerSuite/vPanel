@@ -2,7 +2,6 @@
 name: "\U0001F680 Feature request"
 about: Suggest an idea for this project
 title: "[NEW FEATURE] "
-labels: New Feature Request
 assignees: ''
 
 ---
@@ -10,14 +9,6 @@ assignees: ''
 # Feature request
 
 <!-- This template is for feature requests. Please fill out the following: -->
-
-
-#### Select the type of feature you are requesting:
-
-<!-- To check a box, replace the space between the [] with a x -->
-
-- [ ] Command
-- [ ] Other
 
 #### Describe your requested feature
 
