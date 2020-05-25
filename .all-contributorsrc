@@ -15,6 +15,18 @@
       ]
     },
     {
+      "login": "BenHall-1",
+      "name": "Ben Hall",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/15686484?v=4",
+      "profile": "https://benhall.co",
+      "contributions": [
+        "code",
+        "infra",
+        "review",
+        "business"
+      ]
+    },
+    {
       "login": "tommitchelmore",
       "name": "Tom Mitchelmore",
       "avatar_url": "https://avatars3.githubusercontent.com/u/19690833?v=4",
