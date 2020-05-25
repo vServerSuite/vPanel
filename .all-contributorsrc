@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "vSuiteBot",
+      "name": "vSuite Bot Account",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/64778485?v=4",
+      "profile": "https://vsuite.dev",
+      "contributions": [
+        "maintenance"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "vPanel",
+  "projectOwner": "vServerSuite",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
