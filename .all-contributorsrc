@@ -13,6 +13,18 @@
       "contributions": [
         "maintenance"
       ]
+    },
+    {
+      "login": "tommitchelmore",
+      "name": "Tom Mitchelmore",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/19690833?v=4",
+      "profile": "https://tommitchelmore.me",
+      "contributions": [
+        "code",
+        "infra",
+        "review",
+        "business"
+      ]
     }
   ],
   "contributorsPerLine": 7,
