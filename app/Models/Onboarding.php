@@ -17,7 +17,7 @@ class Onboarding extends Model
 
     public $incrementing = false;
 
-    protected $fillable = ['mc_uuid_expected'];
+    protected $fillable = ['mc_uuid_expected', 'mc_uuid_actual', 'discord_id', 'username', 'email'];
 
     protected static function boot()
     {
@@ -28,3 +28,10 @@ class Onboarding extends Model
         });
     }
 }
+
+
+// $table->string('key');
+// $table->string('mc_uuid_expected');
+// $table->string('mc_uuid_actual')->nullable();
+// $table->string('discord_id')->nullable();
+// $table->timestamps(0);
