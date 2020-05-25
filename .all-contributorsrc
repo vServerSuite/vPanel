@@ -1,0 +1,48 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "vSuiteBot",
+      "name": "vSuite Bot Account",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/64778485?v=4",
+      "profile": "https://vsuite.dev",
+      "contributions": [
+        "maintenance"
+      ]
+    },
+    {
+      "login": "BenHall-1",
+      "name": "Ben Hall",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/15686484?v=4",
+      "profile": "https://benhall.co",
+      "contributions": [
+        "code",
+        "infra",
+        "review",
+        "business"
+      ]
+    },
+    {
+      "login": "tommitchelmore",
+      "name": "Tom Mitchelmore",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/19690833?v=4",
+      "profile": "https://tommitchelmore.me",
+      "contributions": [
+        "code",
+        "infra",
+        "review",
+        "business"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "vPanel",
+  "projectOwner": "vServerSuite",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
