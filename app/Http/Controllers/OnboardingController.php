@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Request;
-use App\Models\Onboarding;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
-use App\Models;
+use App\Models\Onboarding;
 use App\User;
 
 class OnboardingController extends Controller
@@ -121,6 +122,18 @@ class OnboardingController extends Controller
                         if ($passwordConfirm != null) {
                             if ($password == $passwordConfirm) {
                                 if (User::where('email', $email)->exists() == false) {
+                                    $createdUser = User::create([
+                                        'name' => $onboardingRequest->username,
+                                        'email' => $email,
+                                        'mc_uuid' => $onboardingRequest->mc_uuid_actual,
+                                        'discord_id' => $onboardingRequest->discord_id,
+                                        'password' => Hash::make($password)
+                                    ]);
+                                    if($createdUser != null) {
+                                        $onboardingRequest->delete();
+                                    }else {
+                                        $error = "Account could not be created. Please contact your Systems Administrator";
+                                    }
                                 } else {
                                     $error = "Email is already registered";
                                 }
@@ -142,7 +155,6 @@ class OnboardingController extends Controller
         } else {
             $error = "Onboarding Id is required";
         }
-
 
         return response()->json([
             'success' => $error == null,

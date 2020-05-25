@@ -18,21 +18,30 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\OnboardingController;
 
+use Illuminate\Support\Facades\Http;
+
 $v1Prefix = "/v1/";
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get($v1Prefix . 'players/{player?}', function ($player = null) {
-    return $player == null ? App\Models\Player::all() : App\Models\Player::find($player);
-});
 
-Route::get($v1Prefix . 'punishments/{player?}', function ($player = null) {
-    return $player == null ? App\Models\Punishment::all() : App\Models\Punishment::where('punishment_uuid', $player)->get();
-});
-Route::get($v1Prefix . 'logs/{player?}', function ($player = null) {
-    return $player == null ? App\Models\Log::all() : App\Models\Log::where('log_player', $player)->get();
+
+Route::middleware('auth:api')->group(function () use ($v1Prefix) {
+    Route::get($v1Prefix . 'players/{player?}', function ($player = null) {
+        return $player == null ? App\Models\Player::all() : App\Models\Player::find($player);
+    });
+    Route::get($v1Prefix . 'punishments/{player?}', function ($player = null) {
+        return $player == null ? App\Models\Punishment::all() : App\Models\Punishment::where('punishment_uuid', $player)->get();
+    });
+    Route::get($v1Prefix . 'logs/{player?}', function ($player = null) {
+        return $player == null ? App\Models\Log::all() : App\Models\Log::where('log_player', $player)->get();
+    });
+    Route::get($v1Prefix . 'onlineplayers', function () {
+        return Http::withHeaders(['Authorization' => 'Basic ' . env('MINECRAFT_API_KEY')])
+            ->get(env('MINECRAFT_API_URL') . '/players');
+    });
 });
 
 Route::get($v1Prefix . 'auth/discord', 'DiscordController@generateAuthUrl');

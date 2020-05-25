@@ -356,7 +356,7 @@ export default {
                 })
                 .then(function(saveResponse) {
                     if (saveResponse.data.success) {
-                        console.log(saveResponse.data);
+                        vm.$toast.success("Your account has been created");
                     } else {
                         vm.$toast.error(saveResponse.data.error);
                     }
