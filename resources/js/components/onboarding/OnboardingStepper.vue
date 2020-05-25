@@ -64,9 +64,6 @@
                             >
                                 Verify Account
                             </v-btn>
-                            <v-alert type="error" v-if="mc.error != null">
-                                {{ mc.error }}
-                            </v-alert>
                             <br />
                         </v-col>
                     </div>
@@ -115,9 +112,6 @@
                             >
                                 Login with Discord
                             </v-btn>
-                            <v-alert type="error" v-if="discord.error != null">
-                                {{ discord.error }}
-                            </v-alert>
                             <br />
                         </v-col>
                     </div>
@@ -168,13 +162,31 @@
                             ></OnboardingCard>
                         </v-col>
                         <v-col cols="6">
-                            <v-form
-                                ref="form"
-                            >
+                            <v-form ref="form">
                                 <v-text-field
+                                    label="Username"
+                                    v-model="registration.username"
+                                    disabled
+                                    required
+                                ></v-text-field>
+                                <v-text-field
+                                    label="Email Address"
+                                    v-model="registration.email"
                                     :rules="emailRules"
-                                    label="E-mail Address"
-                                    :v-text="discord.email"
+                                    required
+                                ></v-text-field>
+                                <v-text-field
+                                    label="Password"
+                                    v-model="registration.password"
+                                    :rules="passwordRules"
+                                    type="password"
+                                    required
+                                ></v-text-field>
+                                <v-text-field
+                                    label="Confirm Password"
+                                    v-model="registration.password_confirm"
+                                    :rules="passwordRules"
+                                    type="password"
                                     required
                                 ></v-text-field>
                             </v-form>
@@ -226,9 +238,23 @@ export default {
                 id: null,
                 avatar: null
             },
+            registration: {
+                username: null,
+                email: null,
+                password: null,
+                password_confirm: null,
+                onboardingid: this.onboarding_id
+            },
             emailRules: [
                 v => !!v || "E-mail is required",
                 v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+            ],
+            passwordRules: [
+                v => !!v || "Password is required",
+                v =>
+                    this.registration.password ==
+                        this.registration.password_confirm ||
+                    "Passwords must match"
             ]
         };
     },
@@ -244,20 +270,28 @@ export default {
                 .then(function(response) {
                     if (response.data.isValid != "true") {
                         vm.mc.error = response.data.error;
+                        vm.$toast.error(response.data.error);
                     } else {
                         axios
                             .post("/api/v1/onboarding/save/mc", {
                                 key: vm.onboarding_id,
-                                mc_uuid: response.data.uuid
+                                mc_uuid: response.data.uuid,
+                                mc_username: response.data.username
                             })
                             .then(function(saveResponse) {
                                 if (saveResponse.data.success == false) {
                                     vm.mc.error = saveResponse.data.error;
+                                    vm.$toast.error(saveResponse.data.error);
                                 } else {
+                                    vm.$toast.success(
+                                        "Minecraft Username Saved for Onboarding"
+                                    );
                                     vm.mc.uuid = response.data.uuid;
                                     vm.mc.username = response.data.username;
                                     vm.mc.valid =
                                         response.data.isValid == "true";
+                                    vm.registration.username =
+                                        response.data.username;
                                 }
                             });
                     }
@@ -282,25 +316,26 @@ export default {
                         axios
                             .post("/api/v1/onboarding/save/discord", {
                                 key: vm.onboarding_id,
-                                discord_id: response.data.id
+                                discord_id: response.data.id,
+                                discord_email: response.data.email
                             })
                             .then(function(saveResponse) {
                                 if (saveResponse.data.success == false) {
                                     vm.discord.error = saveResponse.data.error;
+                                    vm.$toast.error(saveResponse.data.error);
                                 } else {
+                                    vm.$toast.success(
+                                        "Discord Username Saved for Onboarding"
+                                    );
                                     vm.discord.valid = true;
                                     vm.discord.username =
                                         response.data.username;
                                     vm.discord.email = response.data.email;
                                     vm.discord.id = response.data.id;
                                     vm.discord.avatar = response.data.avatar;
+                                    vm.registration.email = response.data.email;
                                 }
                             });
-                        vm.discord.loading = false;
-                    })
-                    .then(function(response) {
-                        vm.discord.error =
-                            "Error whilst authenticating you with discord, please try again";
                         vm.discord.loading = false;
                     });
             });

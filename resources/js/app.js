@@ -5,9 +5,21 @@
  */
 
 window.Vue = require('vue');
+
 import Vuetify from 'vuetify';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 Vue.use(Vuetify);
+Vue.use(Toast, {
+    position: 'bottom-right',
+    newestOnTop: true,
+    transition: 'Vue-Toastification__bounce',
+    transitionDuration: 750,
+    draggable: true,
+    draggablePercent: 0.6,
+    pauseOnHover: true
+});
 
 /**
  * The following block of code may be used to automatically register your

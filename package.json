@@ -26,6 +26,7 @@
     },
     "dependencies": {
         "vue-pincode-input": "^0.2.0",
+        "vue-toastification": "^1.7.1",
         "vuetify": "^2.2.27"
     }
 }
