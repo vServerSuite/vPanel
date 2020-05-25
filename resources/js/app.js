@@ -9,6 +9,10 @@ window.Vue = require('vue');
 import Vuetify from 'vuetify';
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import * as Sentry from '@sentry/browser';
+import {
+    Vue as VueIntegration
+} from '@sentry/integrations';
 
 Vue.use(Vuetify);
 Vue.use(Toast, {
@@ -19,6 +23,13 @@ Vue.use(Toast, {
     draggable: true,
     draggablePercent: 0.6,
     pauseOnHover: true
+});
+Sentry.init({
+    dsn: process.env.MIX_SENTRY_VUE_DSN,
+    integrations: [new VueIntegration({
+        Vue,
+        attachProps: true
+    })],
 });
 
 /**

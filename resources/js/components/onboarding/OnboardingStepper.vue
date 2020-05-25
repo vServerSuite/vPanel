@@ -59,7 +59,7 @@
                             <br />
                             <v-btn
                                 :loading="mc.loading"
-                                :disabled="(mc.loading || mc.valid)"
+                                :disabled="mc.loading || mc.valid"
                                 class="ma-2"
                                 color="primary"
                                 @click="checkCode()"
@@ -192,6 +192,11 @@
                                     type="password"
                                     required
                                 ></v-text-field>
+                                <div style="float: right;">
+                                    <v-btn color="primary" @click="completeRegistration">
+                                        Complete Registration
+                                    </v-btn>
+                                </div>
                             </v-form>
                         </v-col>
                     </v-row>
@@ -254,13 +259,7 @@ export default {
                 v => !!v || "E-mail is required",
                 v => /.+@.+\..+/.test(v) || "E-mail must be valid"
             ],
-            passwordRules: [
-                v => !!v || "Password is required",
-                v =>
-                    this.registration.password ==
-                        this.registration.password_confirm ||
-                    "Passwords must match"
-            ]
+            passwordRules: [v => !!v || "Password is required"]
         };
     },
     methods: {
@@ -342,6 +341,26 @@ export default {
                         vm.discord.loading = false;
                     });
             });
+        },
+        completeRegistration: function() {
+            var vm = this;
+            let service = axios.create({
+                responseType: "json"
+            });
+            axios
+                .post("/api/v1/onboarding/register", {
+                    onboarding_id: vm.onboarding_id,
+                    email: vm.registration.email,
+                    password: vm.registration.password,
+                    password_confirm: vm.registration.password_confirm
+                })
+                .then(function(saveResponse) {
+                    if (saveResponse.data.success) {
+                        console.log(saveResponse.data);
+                    } else {
+                        vm.$toast.error(saveResponse.data.error);
+                    }
+                });
         }
     }
 };

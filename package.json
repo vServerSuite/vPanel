@@ -25,6 +25,8 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "@sentry/browser": "^5.15.5",
+        "@sentry/integrations": "^5.15.5",
         "vue-pincode-input": "^0.2.0",
         "vue-toastification": "^1.7.1",
         "vuetify": "^2.2.27"

@@ -42,6 +42,7 @@ Route::post($v1Prefix . 'auth/discord/flow', 'DiscordController@code_exchange');
 Route::post($v1Prefix . 'onboarding/generate', 'OnboardingController@generate');
 Route::post($v1Prefix . 'onboarding/save/mc', 'OnboardingController@save_mc');
 Route::post($v1Prefix . 'onboarding/save/discord', 'OnboardingController@save_discord');
+Route::post($v1Prefix . 'onboarding/register', 'OnboardingController@register');
 
 Route::post($v1Prefix . 'auth/minecraft', function (Request $request) {
     $token = App\Models\PanelVerificationToken::where('token', $request->input('code'))->first();

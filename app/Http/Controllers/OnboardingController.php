@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Request;
 use App\Models\Onboarding;
 
 use App\Models;
+use App\User;
 
 class OnboardingController extends Controller
 {
@@ -97,6 +98,51 @@ class OnboardingController extends Controller
         } else {
             $error = "Onboarding Id is required to update Discord record";
         }
+
+        return response()->json([
+            'success' => $error == null,
+            'error' => $error
+        ]);
+    }
+
+    public function register(Request $request)
+    {
+        $onboardingId = $request::input('onboarding_id');
+        $email = $request::input('email');
+        $password = $request::input('password');
+        $passwordConfirm = $request::input('password_confirm');
+        $error = null;
+
+        if ($onboardingId != null) {
+            $onboardingRequest = Onboarding::find($onboardingId);
+            if ($onboardingRequest != null) {
+                if ($email != null) {
+                    if ($password != null) {
+                        if ($passwordConfirm != null) {
+                            if ($password == $passwordConfirm) {
+                                if (User::where('email', $email)->exists() == false) {
+                                } else {
+                                    $error = "Email is already registered";
+                                }
+                            } else {
+                                $error = "Passwords do not match";
+                            }
+                        } else {
+                            $error = "Confirmation Password is required";
+                        }
+                    } else {
+                        $error = "Password is required";
+                    }
+                } else {
+                    $error = "Email is required";
+                }
+            } else {
+                $error = "Onboarding Id was not found";
+            }
+        } else {
+            $error = "Onboarding Id is required";
+        }
+
 
         return response()->json([
             'success' => $error == null,
