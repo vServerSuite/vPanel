@@ -33,11 +33,13 @@
                     >
                 </div>
 
-                <v-btn color="primary" @click="stepperPosition = 2">
+                <v-btn
+                    color="primary"
+                    @click="stepperPosition = 2"
+                    style="float: right;"
+                >
                     Continue
                 </v-btn>
-
-                <v-btn text>Cancel</v-btn>
             </v-stepper-content>
 
             <!-- Minecraft Verification Page -->
@@ -57,7 +59,7 @@
                             <br />
                             <v-btn
                                 :loading="mc.loading"
-                                :disabled="mc.loading"
+                                :disabled="(mc.loading || mc.valid)"
                                 class="ma-2"
                                 color="primary"
                                 @click="checkCode()"
@@ -79,7 +81,7 @@
                         </v-row>
                     </v-col>
                 </div>
-                <div class="ml-auto">
+                <div style="float: right;">
                     <v-btn
                         color="primary"
                         @click="stepperPosition = 3"
@@ -125,16 +127,17 @@
                         </v-row>
                     </v-col>
                 </div>
+                <div style="float: right;">
+                    <v-btn
+                        color="primary"
+                        @click="stepperPosition = 4"
+                        :disabled="!discord.valid"
+                    >
+                        Continue
+                    </v-btn>
 
-                <v-btn
-                    color="primary"
-                    @click="stepperPosition = 4"
-                    :disabled="!discord.valid"
-                >
-                    Continue
-                </v-btn>
-
-                <v-btn @click="stepperPosition = 2" text>Cancel</v-btn>
+                    <v-btn @click="stepperPosition = 2" text>Cancel</v-btn>
+                </div>
             </v-stepper-content>
 
             <!-- Final Registration Page -->
@@ -193,7 +196,9 @@
                         </v-col>
                     </v-row>
                 </div>
-                <v-btn @click="stepperPosition = 3" text>Cancel</v-btn>
+                <div style="float: right;">
+                    <v-btn @click="stepperPosition = 3" text>Cancel</v-btn>
+                </div>
             </v-stepper-content>
         </v-stepper-items>
     </v-stepper>
@@ -268,8 +273,7 @@ export default {
             axios
                 .post("/api/v1/auth/minecraft", { code: vm.mc.code })
                 .then(function(response) {
-                    if (response.data.isValid != "true") {
-                        vm.mc.error = response.data.error;
+                    if (response.data.isValid != true) {
                         vm.$toast.error(response.data.error);
                     } else {
                         axios
@@ -288,8 +292,7 @@ export default {
                                     );
                                     vm.mc.uuid = response.data.uuid;
                                     vm.mc.username = response.data.username;
-                                    vm.mc.valid =
-                                        response.data.isValid == "true";
+                                    vm.mc.valid = response.data.isValid == true;
                                     vm.registration.username =
                                         response.data.username;
                                 }

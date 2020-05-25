@@ -2449,6 +2449,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -2517,8 +2522,7 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
       axios.post("/api/v1/auth/minecraft", {
         code: vm.mc.code
       }).then(function (response) {
-        if (response.data.isValid != "true") {
-          vm.mc.error = response.data.error;
+        if (response.data.isValid != true) {
           vm.$toast.error(response.data.error);
         } else {
           axios.post("/api/v1/onboarding/save/mc", {
@@ -2533,7 +2537,7 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
               vm.$toast.success("Minecraft Username Saved for Onboarding");
               vm.mc.uuid = response.data.uuid;
               vm.mc.username = response.data.username;
-              vm.mc.valid = response.data.isValid == "true";
+              vm.mc.valid = response.data.isValid == true;
               vm.registration.username = response.data.username;
             }
           });
@@ -6879,6 +6883,7 @@ var render = function() {
               _c(
                 "v-btn",
                 {
+                  staticStyle: { float: "right" },
                   attrs: { color: "primary" },
                   on: {
                     click: function($event) {
@@ -6887,9 +6892,7 @@ var render = function() {
                   }
                 },
                 [_vm._v("\n                Continue\n            ")]
-              ),
-              _vm._v(" "),
-              _c("v-btn", { attrs: { text: "" } }, [_vm._v("Cancel")])
+              )
             ],
             1
           ),
@@ -6938,7 +6941,7 @@ var render = function() {
                                 staticClass: "ma-2",
                                 attrs: {
                                   loading: _vm.mc.loading,
-                                  disabled: _vm.mc.loading,
+                                  disabled: _vm.mc.loading || _vm.mc.valid,
                                   color: "primary"
                                 },
                                 on: {
@@ -6993,7 +6996,7 @@ var render = function() {
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "ml-auto" },
+              { staticStyle: { float: "right" } },
               [
                 _c(
                   "v-btn",
@@ -7025,264 +7028,268 @@ var render = function() {
             )
           ]),
           _vm._v(" "),
-          _c(
-            "v-stepper-content",
-            { attrs: { step: "3" } },
-            [
-              _c(
-                "div",
-                { staticClass: "text-center" },
-                [
-                  _c("h1", [_vm._v("Discord Account Link")]),
-                  _vm._v(" "),
-                  _c("span", [
-                    _vm._v(
-                      "To access the site, you need to link your discord\n                    account. To link your account you need to login to\n                    Discord using the button below"
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "input-wrapper" },
-                    [
-                      !_vm.discord.valid
-                        ? _c(
-                            "v-col",
-                            [
-                              _c(
-                                "v-btn",
-                                {
-                                  staticClass: "ma-2",
-                                  attrs: {
-                                    loading: _vm.discord.loading,
-                                    disabled: _vm.discord.loading,
-                                    color: "#7289DA"
-                                  },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.verifyDiscord()
-                                    }
+          _c("v-stepper-content", { attrs: { step: "3" } }, [
+            _c(
+              "div",
+              { staticClass: "text-center" },
+              [
+                _c("h1", [_vm._v("Discord Account Link")]),
+                _vm._v(" "),
+                _c("span", [
+                  _vm._v(
+                    "To access the site, you need to link your discord\n                    account. To link your account you need to login to\n                    Discord using the button below"
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "input-wrapper" },
+                  [
+                    !_vm.discord.valid
+                      ? _c(
+                          "v-col",
+                          [
+                            _c(
+                              "v-btn",
+                              {
+                                staticClass: "ma-2",
+                                attrs: {
+                                  loading: _vm.discord.loading,
+                                  disabled: _vm.discord.loading,
+                                  color: "#7289DA"
+                                },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.verifyDiscord()
                                   }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                            Login with Discord\n                        "
-                                  )
-                                ]
-                              ),
-                              _vm._v(" "),
-                              _c("br")
-                            ],
-                            1
-                          )
-                        : _vm._e()
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "v-col",
-                    { attrs: { cols: "12" } },
-                    [
-                      _c(
-                        "v-row",
-                        { attrs: { align: "center", justify: "center" } },
-                        [
-                          _c("OnboardingCard", {
-                            attrs: {
-                              visible: _vm.discord.valid,
-                              title: _vm.discord.username,
-                              imgUrl: _vm.discord.avatar
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  attrs: { color: "primary", disabled: !_vm.discord.valid },
-                  on: {
-                    click: function($event) {
-                      _vm.stepperPosition = 4
-                    }
-                  }
-                },
-                [_vm._v("\n                Continue\n            ")]
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  attrs: { text: "" },
-                  on: {
-                    click: function($event) {
-                      _vm.stepperPosition = 2
-                    }
-                  }
-                },
-                [_vm._v("Cancel")]
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-stepper-content",
-            { attrs: { step: "4" } },
-            [
-              _c(
-                "div",
-                { staticClass: "text-center" },
-                [
-                  _c("h1", [_vm._v("Complete Registration")]),
-                  _vm._v(" "),
-                  _c("span", [
-                    _vm._v(
-                      "Please fill in the form below to register for the\n                    site."
+                                }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                            Login with Discord\n                        "
+                                )
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c("br")
+                          ],
+                          1
+                        )
+                      : _vm._e()
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-col",
+                  { attrs: { cols: "12" } },
+                  [
+                    _c(
+                      "v-row",
+                      { attrs: { align: "center", justify: "center" } },
+                      [
+                        _c("OnboardingCard", {
+                          attrs: {
+                            visible: _vm.discord.valid,
+                            title: _vm.discord.username,
+                            imgUrl: _vm.discord.avatar
+                          }
+                        })
+                      ],
+                      1
                     )
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "v-row",
-                    { attrs: { align: "center", justify: "center" } },
-                    [
-                      _c(
-                        "v-col",
-                        { attrs: { cols: "4" } },
-                        [
-                          _c("OnboardingCard", {
-                            attrs: {
-                              visible: _vm.discord.valid,
-                              title: _vm.discord.username,
-                              imgUrl: _vm.discord.avatar
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("br"),
-                          _vm._v(" "),
-                          _c("OnboardingCard", {
-                            attrs: {
-                              visible: _vm.mc.valid,
-                              title: _vm.mc.username,
-                              imgUrl:
-                                "https://visage.surgeplay.com/bust/128/" +
-                                _vm.mc.uuid +
-                                ".png"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-col",
-                        { attrs: { cols: "6" } },
-                        [
-                          _c(
-                            "v-form",
-                            { ref: "form" },
-                            [
-                              _c("v-text-field", {
-                                attrs: {
-                                  label: "Username",
-                                  disabled: "",
-                                  required: ""
-                                },
-                                model: {
-                                  value: _vm.registration.username,
-                                  callback: function($$v) {
-                                    _vm.$set(_vm.registration, "username", $$v)
-                                  },
-                                  expression: "registration.username"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("v-text-field", {
-                                attrs: {
-                                  label: "Email Address",
-                                  rules: _vm.emailRules,
-                                  required: ""
-                                },
-                                model: {
-                                  value: _vm.registration.email,
-                                  callback: function($$v) {
-                                    _vm.$set(_vm.registration, "email", $$v)
-                                  },
-                                  expression: "registration.email"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("v-text-field", {
-                                attrs: {
-                                  label: "Password",
-                                  rules: _vm.passwordRules,
-                                  type: "password",
-                                  required: ""
-                                },
-                                model: {
-                                  value: _vm.registration.password,
-                                  callback: function($$v) {
-                                    _vm.$set(_vm.registration, "password", $$v)
-                                  },
-                                  expression: "registration.password"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("v-text-field", {
-                                attrs: {
-                                  label: "Confirm Password",
-                                  rules: _vm.passwordRules,
-                                  type: "password",
-                                  required: ""
-                                },
-                                model: {
-                                  value: _vm.registration.password_confirm,
-                                  callback: function($$v) {
-                                    _vm.$set(
-                                      _vm.registration,
-                                      "password_confirm",
-                                      $$v
-                                    )
-                                  },
-                                  expression: "registration.password_confirm"
-                                }
-                              })
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-btn",
-                {
-                  attrs: { text: "" },
-                  on: {
-                    click: function($event) {
-                      _vm.stepperPosition = 3
+                  ],
+                  1
+                )
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticStyle: { float: "right" } },
+              [
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { color: "primary", disabled: !_vm.discord.valid },
+                    on: {
+                      click: function($event) {
+                        _vm.stepperPosition = 4
+                      }
                     }
-                  }
-                },
-                [_vm._v("Cancel")]
-              )
-            ],
-            1
-          )
+                  },
+                  [_vm._v("\n                    Continue\n                ")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { text: "" },
+                    on: {
+                      click: function($event) {
+                        _vm.stepperPosition = 2
+                      }
+                    }
+                  },
+                  [_vm._v("Cancel")]
+                )
+              ],
+              1
+            )
+          ]),
+          _vm._v(" "),
+          _c("v-stepper-content", { attrs: { step: "4" } }, [
+            _c(
+              "div",
+              { staticClass: "text-center" },
+              [
+                _c("h1", [_vm._v("Complete Registration")]),
+                _vm._v(" "),
+                _c("span", [
+                  _vm._v(
+                    "Please fill in the form below to register for the\n                    site."
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "v-row",
+                  { attrs: { align: "center", justify: "center" } },
+                  [
+                    _c(
+                      "v-col",
+                      { attrs: { cols: "4" } },
+                      [
+                        _c("OnboardingCard", {
+                          attrs: {
+                            visible: _vm.discord.valid,
+                            title: _vm.discord.username,
+                            imgUrl: _vm.discord.avatar
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(" "),
+                        _c("OnboardingCard", {
+                          attrs: {
+                            visible: _vm.mc.valid,
+                            title: _vm.mc.username,
+                            imgUrl:
+                              "https://visage.surgeplay.com/bust/128/" +
+                              _vm.mc.uuid +
+                              ".png"
+                          }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-col",
+                      { attrs: { cols: "6" } },
+                      [
+                        _c(
+                          "v-form",
+                          { ref: "form" },
+                          [
+                            _c("v-text-field", {
+                              attrs: {
+                                label: "Username",
+                                disabled: "",
+                                required: ""
+                              },
+                              model: {
+                                value: _vm.registration.username,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.registration, "username", $$v)
+                                },
+                                expression: "registration.username"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("v-text-field", {
+                              attrs: {
+                                label: "Email Address",
+                                rules: _vm.emailRules,
+                                required: ""
+                              },
+                              model: {
+                                value: _vm.registration.email,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.registration, "email", $$v)
+                                },
+                                expression: "registration.email"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("v-text-field", {
+                              attrs: {
+                                label: "Password",
+                                rules: _vm.passwordRules,
+                                type: "password",
+                                required: ""
+                              },
+                              model: {
+                                value: _vm.registration.password,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.registration, "password", $$v)
+                                },
+                                expression: "registration.password"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("v-text-field", {
+                              attrs: {
+                                label: "Confirm Password",
+                                rules: _vm.passwordRules,
+                                type: "password",
+                                required: ""
+                              },
+                              model: {
+                                value: _vm.registration.password_confirm,
+                                callback: function($$v) {
+                                  _vm.$set(
+                                    _vm.registration,
+                                    "password_confirm",
+                                    $$v
+                                  )
+                                },
+                                expression: "registration.password_confirm"
+                              }
+                            })
+                          ],
+                          1
+                        )
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                )
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticStyle: { float: "right" } },
+              [
+                _c(
+                  "v-btn",
+                  {
+                    attrs: { text: "" },
+                    on: {
+                      click: function($event) {
+                        _vm.stepperPosition = 3
+                      }
+                    }
+                  },
+                  [_vm._v("Cancel")]
+                )
+              ],
+              1
+            )
+          ])
         ],
         1
       )
