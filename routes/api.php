@@ -46,18 +46,37 @@ Route::post($v1Prefix . 'onboarding/save/discord', 'OnboardingController@save_di
 Route::post($v1Prefix . 'auth/minecraft', function (Request $request) {
     $token = App\Models\PanelVerificationToken::where('token', $request->input('code'))->first();
 
-    $valid = $token != null and $token->used == '0';
+    $valid = false;
+    $uuid = null;
+    $username = null;
+    $error = null;
+
+    if ($token != null) {
+        if ($token->token_used == '0') {
+            $uuid = $token->token_uuid;
+            $player = App\Models\Player::find($uuid);
+            if ($player != null) {
+                $username = $player->player_username;
+                $valid = true;
+            } else {
+                $error = "Player could not be found in the database. Please report this error to your Systems Administrator";
+            }
+        } else {
+            $error = "Token has already been used";
+        }
+    } else {
+        $error = "Token could not be found";
+    }
 
     if ($valid) {
-        $uuid = $token->token_uuid;
-        $player = App\Models\Player::find($uuid);
-        $username = $player->player_username;
-
         $token->token_used = '1';
         $token->save();
-
-        return '{"isValid": "true", "uuid": "' . $uuid . '", "username": "' . $username . '"}';
-    } else {
-        return '{"isValid": "false", "error": "Incorrect Authentication Pin"}';
     }
+
+    return response()->json([
+        'isValid' => $valid,
+        'uuid' => $uuid,
+        'username' => $username,
+        'error' => $error
+    ]);
 });
