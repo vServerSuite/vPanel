@@ -13,6 +13,18 @@
       "contributions": [
         "maintenance"
       ]
+    },
+    {
+      "login": "BenHall-1",
+      "name": "Ben Hall",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/15686484?v=4",
+      "profile": "https://benhall.co",
+      "contributions": [
+        "code",
+        "infra",
+        "review",
+        "business"
+      ]
     }
   ],
   "contributorsPerLine": 7,
