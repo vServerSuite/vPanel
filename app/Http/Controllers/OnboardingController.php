@@ -11,6 +11,7 @@ use App\User;
 
 class OnboardingController extends Controller
 {
+
     public function generate(Request $request)
     {
         $code = $request::input('mc_uuid');

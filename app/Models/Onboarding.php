@@ -28,10 +28,3 @@ class Onboarding extends Model
         });
     }
 }
-
-
-// $table->string('key');
-// $table->string('mc_uuid_expected');
-// $table->string('mc_uuid_actual')->nullable();
-// $table->string('discord_id')->nullable();
-// $table->timestamps(0);
