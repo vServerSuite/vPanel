@@ -1,0 +1,6 @@
+engines:
+  sonar-php:
+    enabled: true
+    checks:
+      php:S3776:
+        enabled: false
