@@ -33,11 +33,13 @@
                     >
                 </div>
 
-                <v-btn color="primary" @click="stepperPosition = 2">
+                <v-btn
+                    color="primary"
+                    @click="stepperPosition = 2"
+                    style="float: right;"
+                >
                     Continue
                 </v-btn>
-
-                <v-btn text>Cancel</v-btn>
             </v-stepper-content>
 
             <!-- Minecraft Verification Page -->
@@ -57,16 +59,13 @@
                             <br />
                             <v-btn
                                 :loading="mc.loading"
-                                :disabled="mc.loading"
+                                :disabled="mc.loading || mc.valid"
                                 class="ma-2"
                                 color="primary"
                                 @click="checkCode()"
                             >
                                 Verify Account
                             </v-btn>
-                            <v-alert type="error" v-if="mc.error != null">
-                                {{ mc.error }}
-                            </v-alert>
                             <br />
                         </v-col>
                     </div>
@@ -82,7 +81,7 @@
                         </v-row>
                     </v-col>
                 </div>
-                <div class="ml-auto">
+                <div style="float: right;">
                     <v-btn
                         color="primary"
                         @click="stepperPosition = 3"
@@ -115,9 +114,6 @@
                             >
                                 Login with Discord
                             </v-btn>
-                            <v-alert type="error" v-if="discord.error != null">
-                                {{ discord.error }}
-                            </v-alert>
                             <br />
                         </v-col>
                     </div>
@@ -131,16 +127,17 @@
                         </v-row>
                     </v-col>
                 </div>
+                <div style="float: right;">
+                    <v-btn
+                        color="primary"
+                        @click="stepperPosition = 4"
+                        :disabled="!discord.valid"
+                    >
+                        Continue
+                    </v-btn>
 
-                <v-btn
-                    color="primary"
-                    @click="stepperPosition = 4"
-                    :disabled="!discord.valid"
-                >
-                    Continue
-                </v-btn>
-
-                <v-btn @click="stepperPosition = 2" text>Cancel</v-btn>
+                    <v-btn @click="stepperPosition = 2" text>Cancel</v-btn>
+                </div>
             </v-stepper-content>
 
             <!-- Final Registration Page -->
@@ -168,11 +165,45 @@
                             ></OnboardingCard>
                         </v-col>
                         <v-col cols="6">
-                            Test
+                            <v-form ref="form">
+                                <v-text-field
+                                    label="Username"
+                                    v-model="registration.username"
+                                    disabled
+                                    required
+                                ></v-text-field>
+                                <v-text-field
+                                    label="Email Address"
+                                    v-model="registration.email"
+                                    :rules="emailRules"
+                                    required
+                                ></v-text-field>
+                                <v-text-field
+                                    label="Password"
+                                    v-model="registration.password"
+                                    :rules="passwordRules"
+                                    type="password"
+                                    required
+                                ></v-text-field>
+                                <v-text-field
+                                    label="Confirm Password"
+                                    v-model="registration.password_confirm"
+                                    :rules="passwordRules"
+                                    type="password"
+                                    required
+                                ></v-text-field>
+                                <div style="float: right;">
+                                    <v-btn color="primary" @click="completeRegistration">
+                                        Complete Registration
+                                    </v-btn>
+                                </div>
+                            </v-form>
                         </v-col>
                     </v-row>
                 </div>
-                <v-btn @click="stepperPosition = 3" text>Cancel</v-btn>
+                <div style="float: right;">
+                    <v-btn @click="stepperPosition = 3" text>Cancel</v-btn>
+                </div>
             </v-stepper-content>
         </v-stepper-items>
     </v-stepper>
@@ -190,6 +221,11 @@ export default {
     name: "OnboardingStepper",
     components: {
         PincodeInput
+    },
+    props: {
+        onboarding_id: null,
+        onboarding_mc_uuid: null,
+        onboarding_discord_id: null
     },
     data() {
         return {
@@ -211,7 +247,19 @@ export default {
                 username: null,
                 id: null,
                 avatar: null
-            }
+            },
+            registration: {
+                username: null,
+                email: null,
+                password: null,
+                password_confirm: null,
+                onboardingid: this.onboarding_id
+            },
+            emailRules: [
+                v => !!v || "E-mail is required",
+                v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+            ],
+            passwordRules: [v => !!v || "Password is required"]
         };
     },
     methods: {
@@ -224,15 +272,30 @@ export default {
             axios
                 .post("/api/v1/auth/minecraft", { code: vm.mc.code })
                 .then(function(response) {
-                    if (response.data.isValid != "true") {
-                        vm.mc.error = response.data.error;
+                    if (response.data.isValid != true) {
+                        vm.$toast.error(response.data.error);
                     } else {
-                        vm.mc.uuid = response.data.uuid;
-                        vm.mc.username = response.data.username;
-                        vm.mc.valid = response.data.isValid == "true";
-                        axios.post("/api/v1/session", {
-                            mc_uuid: response.data.uuid
-                        });
+                        axios
+                            .post("/api/v1/onboarding/save/mc", {
+                                key: vm.onboarding_id,
+                                mc_uuid: response.data.uuid,
+                                mc_username: response.data.username
+                            })
+                            .then(function(saveResponse) {
+                                if (saveResponse.data.success == false) {
+                                    vm.mc.error = saveResponse.data.error;
+                                    vm.$toast.error(saveResponse.data.error);
+                                } else {
+                                    vm.$toast.success(
+                                        "Minecraft Username Saved for Onboarding"
+                                    );
+                                    vm.mc.uuid = response.data.uuid;
+                                    vm.mc.username = response.data.username;
+                                    vm.mc.valid = response.data.isValid == true;
+                                    vm.registration.username =
+                                        response.data.username;
+                                }
+                            });
                     }
                     vm.mc.loading = false;
                 });
@@ -252,22 +315,52 @@ export default {
                 axios
                     .post("/api/v1/auth/discord/flow", { code: code })
                     .then(function(response) {
-                        vm.discord.valid = true;
-                        vm.discord.username = response.data.username;
-                        vm.discord.email = response.data.email;
-                        vm.discord.id = response.data.id;
-                        vm.discord.avatar = response.data.avatar;
-                        axios.post("/api/v1/session", {
-                            discord_id: response.data.id
-                        });
-                        vm.discord.loading = false;
-                    })
-                    .then(function(response) {
-                        vm.discord.error =
-                            "Error whilst authenticating you with discord, please try again";
+                        axios
+                            .post("/api/v1/onboarding/save/discord", {
+                                key: vm.onboarding_id,
+                                discord_id: response.data.id,
+                                discord_email: response.data.email
+                            })
+                            .then(function(saveResponse) {
+                                if (saveResponse.data.success == false) {
+                                    vm.discord.error = saveResponse.data.error;
+                                    vm.$toast.error(saveResponse.data.error);
+                                } else {
+                                    vm.$toast.success(
+                                        "Discord Username Saved for Onboarding"
+                                    );
+                                    vm.discord.valid = true;
+                                    vm.discord.username =
+                                        response.data.username;
+                                    vm.discord.email = response.data.email;
+                                    vm.discord.id = response.data.id;
+                                    vm.discord.avatar = response.data.avatar;
+                                    vm.registration.email = response.data.email;
+                                }
+                            });
                         vm.discord.loading = false;
                     });
             });
+        },
+        completeRegistration: function() {
+            var vm = this;
+            let service = axios.create({
+                responseType: "json"
+            });
+            axios
+                .post("/api/v1/onboarding/register", {
+                    onboarding_id: vm.onboarding_id,
+                    email: vm.registration.email,
+                    password: vm.registration.password,
+                    password_confirm: vm.registration.password_confirm
+                })
+                .then(function(saveResponse) {
+                    if (saveResponse.data.success) {
+                        vm.$toast.success("Your account has been created");
+                    } else {
+                        vm.$toast.error(saveResponse.data.error);
+                    }
+                });
         }
     }
 };

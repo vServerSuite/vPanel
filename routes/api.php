@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Session;
 */
 
 use App\Http\Controllers\DiscordController;
+use App\Http\Controllers\OnboardingController;
+
+use Illuminate\Support\Facades\Http;
 
 $v1Prefix = "/v1/";
 
@@ -23,49 +26,67 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get($v1Prefix . 'players/{player?}', function ($player = null) {
-    return $player == null ? App\Models\Player::all() : App\Models\Player::find($player);
-});
 
-Route::get($v1Prefix . 'punishments/{player?}', function ($player = null) {
-    return $player == null ? App\Models\Punishment::all() : App\Models\Punishment::where('punishment_uuid', $player)->get();
-});
-Route::get($v1Prefix . 'logs/{player?}', function ($player = null) {
-    return $player == null ? App\Models\Log::all() : App\Models\Log::where('log_player', $player)->get();
+
+Route::middleware('auth:api')->group(function () use ($v1Prefix) {
+    Route::get($v1Prefix . 'players/{player?}', function ($player = null) {
+        return $player == null ? App\Models\Player::all() : App\Models\Player::find($player);
+    });
+    Route::get($v1Prefix . 'punishments/{player?}', function ($player = null) {
+        return $player == null ? App\Models\Punishment::all() : App\Models\Punishment::where('punishment_uuid', $player)->get();
+    });
+    Route::get($v1Prefix . 'logs/{player?}', function ($player = null) {
+        return $player == null ? App\Models\Log::all() : App\Models\Log::where('log_player', $player)->get();
+    });
+    Route::get($v1Prefix . 'onlineplayers', function () {
+        return Http::withHeaders(['Authorization' => 'Basic ' . env('MINECRAFT_API_KEY')])
+            ->get(env('MINECRAFT_API_URL') . '/players');
+    });
 });
 
 Route::get($v1Prefix . 'auth/discord', 'DiscordController@generateAuthUrl');
 Route::get($v1Prefix . 'auth/discord/callback', 'DiscordController@callback');
 Route::post($v1Prefix . 'auth/discord/flow', 'DiscordController@code_exchange');
 
+Route::post($v1Prefix . 'onboarding/generate', 'OnboardingController@generate');
+Route::post($v1Prefix . 'onboarding/save/mc', 'OnboardingController@save_mc');
+Route::post($v1Prefix . 'onboarding/save/discord', 'OnboardingController@save_discord');
+Route::post($v1Prefix . 'onboarding/register', 'OnboardingController@register');
+
 Route::post($v1Prefix . 'auth/minecraft', function (Request $request) {
     $token = App\Models\PanelVerificationToken::where('token', $request->input('code'))->first();
 
-    $valid = $token != null and $token->used == '0';
+    $valid = false;
+    $uuid = null;
+    $username = null;
+    $error = null;
+
+    if ($token != null) {
+        if ($token->token_used == '0') {
+            $uuid = $token->token_uuid;
+            $player = App\Models\Player::find($uuid);
+            if ($player != null) {
+                $username = $player->player_username;
+                $valid = true;
+            } else {
+                $error = "Player could not be found in the database. Please report this error to your Systems Administrator";
+            }
+        } else {
+            $error = "Token has already been used";
+        }
+    } else {
+        $error = "Token could not be found";
+    }
 
     if ($valid) {
-        $uuid = $token->token_uuid;
-        $player = App\Models\Player::find($uuid);
-        $username = $player->player_username;
-
         $token->token_used = '1';
         $token->save();
-
-        return '{"isValid": "true", "uuid": "' . $uuid . '", "username": "' . $username . '"}';
-    } else {
-        return '{"isValid": "false", "error": "Incorrect Authentication Pin"}';
     }
-});
 
-Route::group(['middleware' => ['web']], function () {
-    Route::post('/v1/session', function (Request $request) {
-        $values = $request->all();
-        foreach ($values as $key => $value) {
-            $request->session()->put($key, $value);
-        }
-        var_dump($request->session()->all());
-    });
-    Route::get('/v1/session/{key?}', function (Request $request, $key = null) {
-        return $key == null ? json_encode($request->session()->all()) : json_encode($request->session()->get($key));
-    });
+    return response()->json([
+        'isValid' => $valid,
+        'uuid' => $uuid,
+        'username' => $username,
+        'error' => $error
+    ]);
 });
