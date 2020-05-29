@@ -17,16 +17,18 @@ use Illuminate\Support\Facades\Session;
 
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\Admin\PermissionsController;
 
 use Illuminate\Support\Facades\Http;
+
+use Spatie\Permission\Models\Permission;
+use App\User;
 
 $v1Prefix = "/v1/";
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-
 
 Route::middleware('auth:api')->group(function () use ($v1Prefix) {
     Route::get($v1Prefix . 'players/{player?}', function ($player = null) {
@@ -42,6 +44,33 @@ Route::middleware('auth:api')->group(function () use ($v1Prefix) {
         return Http::withHeaders(['Authorization' => 'Basic ' . env('MINECRAFT_API_KEY')])
             ->get(env('MINECRAFT_API_URL') . '/players');
     });
+    Route::get($v1Prefix . 'donations/{limit?}', function ($limit = 5) {
+        $donations = Http::withHeaders(['X-Tebex-Secret' => env('TEBEX_SECRET_KEY')])
+            ->get('https://plugin.tebex.io/payments/?limit=' . $limit)->json();
+
+        $donationsDto = [];
+
+        foreach ($donations as $donation) {
+            array_push($donationsDto, [
+                'id' => $donation['id'],
+                'amount' => $donation['amount'],
+                'currency' => [
+                    'symbol' => $donation['currency']['symbol']
+                ],
+                'player' => [
+                    'name' => $donation['player']['name'],
+                    'uuid' => preg_replace("/(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/i", "$1-$2-$3-$4-$5", $donation['player']['uuid'])
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'items' => $donationsDto
+        ]);
+    });
+
+    Route::get($v1Prefix . 'permissions/table/headers', 'Admin\PermissionsController@headers');
+    Route::get($v1Prefix . 'permissions/table/users', 'Admin\PermissionsController@users');
 });
 
 Route::get($v1Prefix . 'auth/discord', 'DiscordController@generateAuthUrl');

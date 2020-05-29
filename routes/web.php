@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,13 +15,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware('auth')->group(function () {
+    Route::get('/', function () {
+        return authView('View Dashboard', 'dashboard');
+    });
+    Route::get('/admin/permissions', function() {
+        return view('admin/permissions_matrix');
+    });
 });
 
-Auth::routes(['verify' => true]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+Auth::routes(['verify' => true]);
 
 Route::get('/onboarding/{onboarding_id}', function ($onboardingid) {
     $onboarding = App\Models\Onboarding::find($onboardingid);
@@ -43,3 +49,9 @@ Route::get('/onboarding/{onboarding_id}', function ($onboardingid) {
 Route::get('/discord/callback', function () {
     return view('auth/discord_callback');
 });
+
+function authView($permission, $view)
+{
+    $user = Auth::user();
+    return view($user->can($permission) ? $view : 'error/access_denied');
+}

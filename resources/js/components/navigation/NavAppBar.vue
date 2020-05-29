@@ -6,7 +6,11 @@
             <v-icon>mdi-account-circle</v-icon>
         </v-btn>
         <v-btn icon>
-            <v-icon>mdi-logout</v-icon>
+            <form action="/logout" method="POST">
+                <v-btn  type="submit" text icon>
+                    <v-icon>mdi-logout</v-icon>
+                </v-btn>
+            </form>
         </v-btn>
     </v-app-bar>
 </template>

@@ -8,7 +8,10 @@ window.Vue = require('vue');
 
 import Vuetify from 'vuetify';
 import Toast from "vue-toastification";
+import LaravelPermissionToVueJS from 'laravel-permission-to-vuejs';
+
 import "vue-toastification/dist/index.css";
+
 import * as Sentry from '@sentry/browser';
 import {
     Vue as VueIntegration
@@ -24,6 +27,8 @@ Vue.use(Toast, {
     draggablePercent: 0.6,
     pauseOnHover: true
 });
+Vue.use(LaravelPermissionToVueJS);
+
 Sentry.init({
     dsn: process.env.MIX_SENTRY_VUE_DSN,
     integrations: [new VueIntegration({
