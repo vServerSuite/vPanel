@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\Admin\PermissionsController;
+use App\Http\Controllers\ProfileController;
 
 use Illuminate\Support\Facades\Http;
 
@@ -69,8 +70,8 @@ Route::middleware('auth:api')->group(function () use ($v1Prefix) {
         ]);
     });
 
-    Route::get($v1Prefix . 'permissions/table/headers', 'Admin\PermissionsController@headers');
-    Route::get($v1Prefix . 'permissions/table/users', 'Admin\PermissionsController@users');
+    // Route::get($v1Prefix . 'permissions/table/headers', 'Admin\PermissionsController@headers');
+    Route::get($v1Prefix . 'user/details/{userId}', 'ProfileController@user');
 });
 
 Route::get($v1Prefix . 'auth/discord', 'DiscordController@generateAuthUrl');

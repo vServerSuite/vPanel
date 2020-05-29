@@ -1,18 +1,31 @@
 <template>
     <v-container class="mt-3">
         <v-skeleton-loader
-            :loading="headers === null || items === null"
-            transition="fade-transition"
-            type="table"
+            :loading="user.username == null && user.avatar == null"
+            type="list-item-avatar"
         >
-            <v-data-table
-                :headers="headers"
-                :items="items"
-                :items-per-page="5"
-                class="elevation-1"
-            >
-            </v-data-table>
+            <v-avatar><img :src="user.avatar"/></v-avatar>
+            <h1>{{ user.username }}'s Profile</h1>
         </v-skeleton-loader>
+        <v-row>
+            <v-col cols="12" sm="12" lg="6">
+                <v-skeleton-loader
+                    :loading="user.permissions == null"
+                    type="table"
+                >
+                    <v-data-table :headers="headers" :items="user.permissions">
+                        <template v-slot:item.perm_value="{ item }">
+                            <v-simple-checkbox
+                                v-model="item.perm_value"
+                                @input="
+                                    updatePerm(item.perm_name, item.perm_value)
+                                "
+                            ></v-simple-checkbox>
+                        </template>
+                    </v-data-table>
+                </v-skeleton-loader>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 <script>
@@ -22,34 +35,34 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document
     .getAttribute("content");
 export default {
     name: "PermissionsMatrix",
+    props: ["id"],
     data() {
         return {
-            headers: null,
-            items: null
+            user: {
+                username: null,
+                avatar: null,
+                discord: null,
+                permissions: null
+            },
+            headers: [
+                { text: "Permission Name", value: "perm_name" },
+                { text: "Has Permission", value: "perm_value" }
+            ]
         };
     },
     methods: {
-        loadHeaders: function() {
+        loadUserData: function() {
             const vm = this;
-            axios
-                .get("/api/v1/permissions/table/headers")
-                .then(function(response) {
-                    vm.headers = response.data.headers;
-                });
+            axios.get("/api/v1/user/details/1").then(function(response) {
+                vm.user = response.data;
+            });
         },
-        loadUsers: function() {
-            const vm = this;
-            axios
-                .get("/api/v1/permissions/table/users")
-                .then(function(response) {
-                    vm.items = response.data.users;
-                    console.log(vm.items);
-                });
+        updatePerm: function($permName, $permValue) {
+            console.log($permName + " lol " + $permValue);
         }
     },
     mounted: function() {
-        this.loadHeaders();
-        this.loadUsers();
+        this.loadUserData();
     }
 };
 </script>
