@@ -10350,6 +10350,45 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js")["default"];
 
 axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
@@ -10361,16 +10400,18 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
       user: {
         username: null,
         avatar: null,
-        discord: null,
-        permissions: null
+        discord: null
       },
-      headers: [{
-        text: "Permission Name",
-        value: "perm_name"
-      }, {
-        text: "Has Permission",
-        value: "perm_value"
-      }]
+      permissions: {
+        headers: [{
+          text: "Permission Name",
+          value: "perm_name"
+        }, {
+          text: "Has Permission",
+          value: "perm_value"
+        }],
+        values: null
+      }
     };
   },
   methods: {
@@ -10378,6 +10419,9 @@ axios.defaults.headers.common["X-CSRF-TOKEN"] = document.querySelector('meta[nam
       var vm = this;
       axios.get("/api/v1/user/details/1").then(function (response) {
         vm.user = response.data;
+      });
+      axios.get("/api/v1/user/permissions/1").then(function (response) {
+        vm.permissions.values = response.data;
       });
     },
     updatePerm: function updatePerm($permName, $permValue) {
@@ -15218,22 +15262,6 @@ var render = function() {
     { staticClass: "mt-3" },
     [
       _c(
-        "v-skeleton-loader",
-        {
-          attrs: {
-            loading: _vm.user.username == null && _vm.user.avatar == null,
-            type: "list-item-avatar"
-          }
-        },
-        [
-          _c("v-avatar", [_c("img", { attrs: { src: _vm.user.avatar } })]),
-          _vm._v(" "),
-          _c("h1", [_vm._v(_vm._s(_vm.user.username) + "'s Profile")])
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
         "v-row",
         [
           _c(
@@ -15244,44 +15272,133 @@ var render = function() {
                 "v-skeleton-loader",
                 {
                   attrs: {
-                    loading: _vm.user.permissions == null,
-                    type: "table"
+                    loading: _vm.user.username == null,
+                    transition: "fade-transition",
+                    type: "heading"
                   }
                 },
+                [_c("h1", [_vm._v(_vm._s(_vm.user.username) + "'s Profile")])]
+              ),
+              _vm._v(" "),
+              _c("br"),
+              _vm._v(" "),
+              _c(
+                "v-skeleton-loader",
+                {
+                  attrs: {
+                    loading: _vm.user.avatar == null,
+                    transition: "fade-transition",
+                    type: "image",
+                    width: "128",
+                    height: "128"
+                  }
+                },
+                [_c("img", { attrs: { src: _vm.user.avatar } })]
+              ),
+              _vm._v(" "),
+              _c("br"),
+              _vm._v(" "),
+              _c(
+                "v-tabs",
+                { attrs: { "background-color": "primary" } },
                 [
-                  _c("v-data-table", {
-                    attrs: {
-                      headers: _vm.headers,
-                      items: _vm.user.permissions
-                    },
-                    scopedSlots: _vm._u([
-                      {
-                        key: "item.perm_value",
-                        fn: function(ref) {
-                          var item = ref.item
-                          return [
-                            _c("v-simple-checkbox", {
-                              on: {
-                                input: function($event) {
-                                  return _vm.updatePerm(
-                                    item.perm_name,
-                                    item.perm_value
-                                  )
+                  _c(
+                    "v-tab",
+                    [
+                      _c("v-icon", { attrs: { left: "" } }, [
+                        _vm._v("mdi-account")
+                      ]),
+                      _vm._v("\n                    About\n                ")
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-tab",
+                    [
+                      _c("v-icon", { attrs: { left: "" } }, [
+                        _vm._v("mdi-lock")
+                      ]),
+                      _vm._v(
+                        "\n                    Permissions\n                "
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-tab-item",
+                    [
+                      _c(
+                        "v-card",
+                        { attrs: { flat: "" } },
+                        [
+                          _c("v-card-text", [
+                            _c("p", [
+                              _vm._v(
+                                "\n                                About stuff here\n                            "
+                              )
+                            ])
+                          ])
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-tab-item",
+                    [
+                      _c(
+                        "v-skeleton-loader",
+                        {
+                          attrs: {
+                            loading: _vm.permissions.values == null,
+                            transition: "fade-transition",
+                            type: "table"
+                          }
+                        },
+                        [
+                          _c("v-data-table", {
+                            attrs: {
+                              headers: _vm.permissions.headers,
+                              items: _vm.permissions.values
+                            },
+                            scopedSlots: _vm._u([
+                              {
+                                key: "item.perm_value",
+                                fn: function(ref) {
+                                  var item = ref.item
+                                  return [
+                                    _c("v-simple-checkbox", {
+                                      on: {
+                                        input: function($event) {
+                                          return _vm.updatePerm(
+                                            item.perm_name,
+                                            item.perm_value
+                                          )
+                                        }
+                                      },
+                                      model: {
+                                        value: item.perm_value,
+                                        callback: function($$v) {
+                                          _vm.$set(item, "perm_value", $$v)
+                                        },
+                                        expression: "item.perm_value"
+                                      }
+                                    })
+                                  ]
                                 }
-                              },
-                              model: {
-                                value: item.perm_value,
-                                callback: function($$v) {
-                                  _vm.$set(item, "perm_value", $$v)
-                                },
-                                expression: "item.perm_value"
                               }
-                            })
-                          ]
-                        }
-                      }
-                    ])
-                  })
+                            ])
+                          })
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
                 ],
                 1
               )

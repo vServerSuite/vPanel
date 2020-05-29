@@ -70,8 +70,9 @@ Route::middleware('auth:api')->group(function () use ($v1Prefix) {
         ]);
     });
 
-    // Route::get($v1Prefix . 'permissions/table/headers', 'Admin\PermissionsController@headers');
-    Route::get($v1Prefix . 'user/details/{userId}', 'ProfileController@user');
+    Route::get($v1Prefix . 'user/details/{userId}', 'ProfileController@details');
+    Route::get($v1Prefix . 'user/permissions/{userId}', 'ProfileController@permissions');
+    Route::get($v1Prefix . 'user/donations/{userId}', 'ProfileController@donations');
 });
 
 Route::get($v1Prefix . 'auth/discord', 'DiscordController@generateAuthUrl');
