@@ -19,8 +19,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return authView('View Dashboard', 'dashboard');
     });
-    Route::get('/admin/permissions', function() {
-        return view('admin/permissions_matrix');
+    Route::get('/profile/{userId?}', function ($userId = null) {
+        return view('users/profile', ['id' => $userId == null ? Auth::user()->id : $userId]);
     });
 });
 

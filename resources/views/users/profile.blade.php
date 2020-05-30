@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-<permissions-matrix></permissions-matrix>
+<user-profile user_id="{{ $id }}"></user-profile>
 @endsection

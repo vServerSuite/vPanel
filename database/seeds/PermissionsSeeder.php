@@ -9,8 +9,9 @@ class PermissionsSeeder extends Seeder
 {
     public $permissionsToSeed = [
         'View Dashboard',
-        'View Permissions Matrix',
-        'Edit Permissions Matrix'
+        'View Permissions',
+        'Edit Permissions',
+        'View All Profiles'
     ];
 
     public $rolesToSeed = [
