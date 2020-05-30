@@ -1,0 +1,6 @@
+labels:
+  # Make all PRs labeled docs get automatically merged
+  'PR: reviewed-approved': 
+    action: merge
+  '🤷‍♂️ Needs More Info':
+    comment: '⚠️ This has been marked $LABEL by the maintainers'
